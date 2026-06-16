@@ -11,6 +11,6 @@
 
 <br>
 
-![enter image description here](https://github.com/PlataformasWeb-P-AA2026/taller_admin_django__astalberto/blob/main/img/PgAdmin_Admin_Django.png?raw=true)
+<img width="1917" height="1015" alt="image" src="https://github.com/user-attachments/assets/d75cbcb5-6c4a-41b4-a7a4-60f59c56b7f8" />
 
 <br>
