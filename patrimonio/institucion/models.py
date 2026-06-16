@@ -9,19 +9,22 @@ class Museo(models.Model):
     anio_fundacion = models.IntegerField()
 
     def costo_total_produccion(self):
-        total = self.exhibiciones.aggregate(total=Sum("costo_produccion"))["total"]
-        return total or 0
+        exhibiciones = self.exhibiciones.all()
+        suma = 0
+
+        for exhibicion in exhibiciones:
+            suma += exhibicion.costo_produccion
+
+        return suma
 
     def guias_mas_experimentados(self):
-        max_exp = self.guias.aggregate(maximo=Max("anios_experiencia_guia"))["maximo"]
-
-        if max_exp is None:
+        experiencias = list(self.guias.values_list("anios_experiencia_guia"))
+        if not experiencias:
             return ""
-
+        max_exp = max(experiencias)
         nombres = self.guias.filter(anios_experiencia_guia=max_exp).values_list(
             "nombre_completo", flat=True
         )
-
         return ", ".join(nombres)
 
     def __str__(self):
