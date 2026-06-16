@@ -18,7 +18,7 @@ class Museo(models.Model):
         return suma
 
     def guias_mas_experimentados(self):
-        experiencias = list(self.guias.values_list("anios_experiencia_guia"))
+        experiencias = list(self.guias.values_list("anios_experiencia_guia", flat=True))
         if not experiencias:
             return ""
         max_exp = max(experiencias)
