@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum, Max
 
 
 # Create your models here.
@@ -7,10 +8,28 @@ class Museo(models.Model):
     ciudad = models.CharField(max_length=100)
     anio_fundacion = models.IntegerField()
 
+    def costo_total_produccion(self):
+        total = self.exhibiciones.aggregate(total=Sum("costo_produccion"))["total"]
+        return total or 0
+
+    def guias_mas_experimentados(self):
+        max_exp = self.guias.aggregate(maximo=Max("anios_experiencia_guia"))["maximo"]
+
+        if max_exp is None:
+            return ""
+
+        nombres = self.guias.filter(anios_experiencia_guia=max_exp).values_list(
+            "nombre_completo", flat=True
+        )
+
+        return ", ".join(nombres)
+
     def __str__(self):
-        return {
-            f"Museo {self.nombre} de la Ciudad {self.ciudad} fundada en {self.anio_fundacion}"
-        }
+        return (
+            f"Museo {self.nombre} de la Ciudad de {self.ciudad} fundada en {self.anio_fundacion}"
+            f" con el costo total de: {self.costo_total_produccion()}"
+            f" y con los guias mas experimentados {self.guias_mas_experimentados()}"
+        )
 
 
 class GuiaMuseo(models.Model):
@@ -21,9 +40,10 @@ class GuiaMuseo(models.Model):
     museo = models.ForeignKey(Museo, on_delete=models.CASCADE, related_name="guias")
 
     def __str__(self):
-        return {
-            f"Guia {self.nombre_completo} con experiencia de {self.anios_experiencia_guia} que habla {self.idiomas_hablados}"
-        }
+        return (
+            f"Guia {self.nombre_completo} con experiencia de {self.anios_experiencia_guia} años"
+            f" que habla {self.idiomas_hablados}"
+        )
 
 
 class Exhibicion(models.Model):
@@ -37,6 +57,7 @@ class Exhibicion(models.Model):
     )
 
     def __str__(self):
-        return {
-            f"La exhibicion {self.titulo_exhibicion} con duracion de {self.duracion_meses} que costo {self.costo_produccion} con la tematica {self.tematica}"
-        }
+        return (
+            f"La exhibicion {self.titulo_exhibicion} con duracion de {self.duracion_meses} que costo "
+            f"{self.costo_produccion} con la tematica de {self.tematica}"
+        )
